@@ -78,7 +78,10 @@ export default function ContractorSignup({ navigation }) {
         maxLength={5}
       />
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity 
+         style={styles.button}
+         onPress={() => navigation.navigate('ContractorProfile')}
+      >
         <Text style={styles.buttonText}>Create Profile</Text>
       </TouchableOpacity>
     </ScrollView>

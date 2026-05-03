@@ -39,8 +39,10 @@ export default function CustomerSignup({ navigation }) {
         maxLength={5}
       />
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Create Account</Text>
+      <TouchableOpacity 
+         style={styles.button}
+      >
+        <Text style={styles.buttonText}>Create Profile</Text>
       </TouchableOpacity>
 
     </ScrollView>
