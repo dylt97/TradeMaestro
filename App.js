@@ -61,6 +61,7 @@ export default function App() {
         <Stack.Screen name="CustomerTabs" component={CustomerTabs} />
         <Stack.Screen name="ContractorProfile" component={ContractorProfile} />
         <Stack.Screen name="CustomerProfile" component={CustomerProfile} />
+        <Stack.Screen name="Login" component={LoginScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

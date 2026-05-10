@@ -50,7 +50,7 @@ export default function ContractorProfile({ navigation }) {
       {/* Header Row */}
       <View style={styles.header}>
         <Image
-          source={require('./image.jpg')}
+          source={require('./image.jpeg')}
           style={styles.avatar}
         />
         <View style={styles.stats}>

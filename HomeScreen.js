@@ -24,6 +24,13 @@ export default function HomeScreen({ navigation }) {
       >
         <Text style={styles.buttonText}>I'm a Customer</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={styles.loginButton}
+        onPress={() => navigation.navigate('Login')}
+      >
+        <Text style={styles.loginText}>Sign In</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -64,5 +71,19 @@ const styles = StyleSheet.create({
     width: 360,
     height: 360,
     marginBottom: 20,
+  },
+  loginButton: {
+    borderWidth: 1,
+    borderColor: '#4a7aaa',
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 10,
+    marginTop: 12,
+    alignItems: 'center',
+  },
+  loginText: {
+    color: '#6a9ac4',
+    fontSize: 16,
+    fontWeight: '500',
   },
 });
