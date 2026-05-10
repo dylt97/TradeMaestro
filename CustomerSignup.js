@@ -40,9 +40,10 @@ export default function CustomerSignup({ navigation }) {
       />
 
       <TouchableOpacity 
-         style={styles.button}
+        style={styles.button}
+        onPress={() => navigation.navigate('CustomerTabs')}
       >
-        <Text style={styles.buttonText}>Create Profile</Text>
+        <Text style={styles.buttonText}>Create Account</Text>
       </TouchableOpacity>
 
     </ScrollView>

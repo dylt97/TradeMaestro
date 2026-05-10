@@ -80,7 +80,7 @@ export default function ContractorSignup({ navigation }) {
 
       <TouchableOpacity 
          style={styles.button}
-         onPress={() => navigation.navigate('ContractorProfile')}
+         onPress={() => navigation.navigate('ContractorTabs')}
       >
         <Text style={styles.buttonText}>Create Profile</Text>
       </TouchableOpacity>

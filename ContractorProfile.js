@@ -11,9 +11,9 @@ export default function ContractorProfile ({navigation}) {
             city: 'Jellico',
             zipcode: '37762',
             bio: 'Professional Fencer with 20 years experience. Commercial and Residential. Free estimates within 40 miles.',
-            rating: 5.0,
+            rating: 4.9,
             reviews: 15,
-            image: 'image.jpg',
+            image: require('./image.jpeg'),
         };
 
 return (
@@ -22,7 +22,7 @@ return (
     {/* Header Row */}
     <View style={styles.header}>
       <Image 
-        source={{ uri: contractor.image }}
+        source={contractor.image}
         style={styles.avatar}
       />
       <View style={styles.stats}>
@@ -49,7 +49,75 @@ return (
 }
 
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: '#1a2f4e',
-    }
+  container: {
+    flex: 1,
+    backgroundColor: '#1a2f4e',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+    paddingTop: 50,
+  },
+  avatar: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    borderWidth: 3,
+    borderColor: '#2e86de',
+  },
+  stats: {
+    marginLeft: 20,
+  },
+  rating: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  reviews: {
+    fontSize: 14,
+    color: '#a0b4c8',
+    marginTop: 4,
+  },
+  content: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+  name: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginBottom: 4,
+  },
+  trade: {
+    fontSize: 16,
+    color: '#2e86de',
+    marginBottom: 4,
+  },
+  city: {
+    fontSize: 14,
+    color: '#a0b4c8',
+    marginBottom: 16,
+  },
+  divider: {
+    backgroundColor: '#2e4a6e',
+    marginVertical: 16,
+  },
+  bio: {
+    fontSize: 15,
+    color: '#d0dce8',
+    lineHeight: 24,
+    marginBottom: 30,
+  },
+  button: {
+    backgroundColor: '#2e86de',
+    paddingVertical: 16,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: '600',
+  },
 });

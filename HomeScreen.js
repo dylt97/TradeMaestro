@@ -1,10 +1,14 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 
 export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Trade Maestro</Text>
+      <Image 
+        source={require('./assets/Logo.png')}
+        style={styles.logo}
+      />
+      <Text style={styles.title}></Text>
       <Text style={styles.subtitle}>Find trusted local trades</Text>
       
       <TouchableOpacity 
@@ -55,5 +59,10 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 18,
     fontWeight: '600',
+  },
+  logo: {
+    width: 360,
+    height: 360,
+    marginBottom: 20,
   },
 });
