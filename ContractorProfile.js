@@ -4,16 +4,18 @@ import { Divider } from 'react-native-paper';
 import { auth, db } from './firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
-export default function ContractorProfile({ navigation }) {
+export default function ContractorProfile({ navigation, route }) {
   const [contractor, setContractor] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const user = auth.currentUser;
-        if (user) {
-          const docRef = doc(db, 'contractors', user.uid);
+        const contractorId = route?.params?.contractorId;
+        const uid = contractorId || auth.currentUser?.uid;
+      
+        if (uid) {
+          const docRef = doc(db, 'contractors', uid);
           const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
             setContractor(docSnap.data());
