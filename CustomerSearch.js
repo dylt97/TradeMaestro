@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import { db } from './firebase';
+import { collection, getDocs } from 'firebase/firestore';
 
 const trades = [
   { id: '0', label: 'All' },
@@ -15,52 +17,52 @@ const trades = [
   { id: '10', label: 'Other' },
 ];
 
-const contractors = [
-  {
-    id: '1',
-    name: 'William Wilde',
-    trade: 'Fencing',
-    city: 'Jellico',
-    rating: 5.0,
-    reviews: 15,
-    image: require('./image.jpeg'),
-  },
-  {
-    id: '2',
-    name: 'Carlos Rivera',
-    trade: 'Lawn Care',
-    city: 'Knoxville',
-    rating: 4.8,
-    reviews: 32,
-    image: require('./image.jpeg'),
-  },
-  {
-    id: '3',
-    name: 'Mike Johnson',
-    trade: 'Painting',
-    city: 'LaFollette',
-    rating: 4.6,
-    reviews: 21,
-    image: require('./image.jpeg'),
-  },
-];
-
 export default function CustomerSearch({ navigation }) {
   const [selectedTrade, setSelectedTrade] = useState('All');
+  const [contractors, setContractors] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchContractors = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'contractors'));
+        const list = [];
+        querySnapshot.forEach((doc) => {
+          list.push({ id: doc.id, ...doc.data() });
+        });
+        setContractors(list);
+      } catch (error) {
+        console.error('Error fetching contractors:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchContractors();
+  }, []);
+
+  const standardTrades = ['Lawn Care', 'Fencing', 'Painting', 'Plumbing', 'Electrical', 'Carpentry', 'Roofing', 'HVAC', 'Pressure Washing', 'Handyman', 'Concrete / Masonry', 'Tree Service', 'Pool Service', 'Cleaning Service'];
 
   const filtered = selectedTrade === 'All'
     ? contractors
+    : selectedTrade === 'Other'
+    ? contractors.filter(c => !standardTrades.includes(c.trade))
     : contractors.filter(c => c.trade === selectedTrade);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Loading contractors...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
 
-      {/* Header */}
       <Text style={styles.header}>Find a Contractor</Text>
 
-      {/* Filter Pills */}
-      <ScrollView 
-        horizontal 
+      <ScrollView
+        horizontal
         showsHorizontalScrollIndicator={false}
         style={styles.pillContainer}
       >
@@ -83,22 +85,24 @@ export default function CustomerSearch({ navigation }) {
         ))}
       </ScrollView>
 
-      {/* Contractor Cards */}
       <FlatList
         data={filtered}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>No contractors found.</Text>
+        }
         renderItem={({ item }) => (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.card}
-            onPress={() => navigation.navigate('ContractorProfile')}
+            onPress={() => navigation.navigate('ContractorProfile', { contractorId: item.id })}
           >
-            <Image source={item.image} style={styles.avatar} />
+            <Image source={require('./image.jpeg')} style={styles.avatar} />
             <View style={styles.cardInfo}>
               <Text style={styles.name}>{item.name}</Text>
               <Text style={styles.trade}>{item.trade}</Text>
-              <Text style={styles.city}>📍 {item.city}</Text>
-              <Text style={styles.rating}>⭐ {item.rating} ({item.reviews} reviews)</Text>
+              <Text style={styles.city}>📍 {item.zipCode}</Text>
+              <Text style={styles.rating}>⭐ {item.rating || 'New'}</Text>
             </View>
           </TouchableOpacity>
         )}
@@ -113,6 +117,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#1a2f4e',
     paddingTop: 50,
+  },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: '#1a2f4e',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    color: '#a0b4c8',
+    fontSize: 16,
   },
   header: {
     fontSize: 26,
@@ -184,5 +198,11 @@ const styles = StyleSheet.create({
   rating: {
     fontSize: 13,
     color: '#f0c040',
+  },
+  emptyText: {
+    color: '#a0b4c8',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 40,
   },
 });

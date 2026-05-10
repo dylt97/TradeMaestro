@@ -27,7 +27,7 @@ function ContractorTabs() {
         tabBarInactiveTintColor: '#a0b4c8',
       }}
     >
-      <Tab.Screen name="My Profile" component={ContractorProfile} />
+      <Tab.Screen name="My ContractorProfile" component={ContractorProfile} />
       <Tab.Screen name="Find Jobs" component={JobSearch} />
     </Tab.Navigator>
   );
@@ -45,7 +45,7 @@ function CustomerTabs() {
     >
       <Tab.Screen name="Find Contractors" component={CustomerSearch} />
       <Tab.Screen name="Post a Job" component={PostJob} />
-      <Tab.Screen name="My Profile" component={CustomerProfile} />
+      <Tab.Screen name="My CustomerProfile" component={CustomerProfile} />
     </Tab.Navigator>
   );
 }
