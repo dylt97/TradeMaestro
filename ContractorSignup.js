@@ -5,6 +5,7 @@ import { Picker } from '@react-native-picker/picker';
 import { auth, db } from './firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
+import { TRADES } from './trades';
 
 export default function ContractorSignup({ navigation }) {
   const [name, setName] = useState('');
@@ -71,22 +72,9 @@ export default function ContractorSignup({ navigation }) {
           style={styles.picker}
           dropdownIconColor="#ffffff"
         >
-          <Picker.Item label="Select Your Trade..." value="" />
-          <Picker.Item label="Landscaping / Lawn Care" value="landscaping" />
-          <Picker.Item label="Fencing" value="fencing" />
-          <Picker.Item label="Painting" value="painting" />
-          <Picker.Item label="Plumbing" value="plumbing" />
-          <Picker.Item label="Electrical" value="electrical" />
-          <Picker.Item label="Carpentry" value="carpentry" />
-          <Picker.Item label="Roofing" value="roofing" />
-          <Picker.Item label="HVAC" value="hvac" />
-          <Picker.Item label="Pressure Washing" value="pressure_washing" />
-          <Picker.Item label="Handyman" value="handyman" />
-          <Picker.Item label="Concrete / Masonry" value="concrete" />
-          <Picker.Item label="Tree Service" value="tree_service" />
-          <Picker.Item label="Pool Service" value="pool_service" />
-          <Picker.Item label="Cleaning Service" value="cleaning" />
-          <Picker.Item label="Other" value="other" />
+          {TRADES.map(t => (
+            <Picker.Item key={t.value} label={t.label} value={t.value} />
+          ))}
         </Picker>
       </View>
 

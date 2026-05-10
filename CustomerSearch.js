@@ -2,19 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import { db } from './firebase';
 import { collection, getDocs } from 'firebase/firestore';
+import { TRADES } from './trades';
 
 const trades = [
   { id: '0', label: 'All' },
-  { id: '1', label: 'Lawn Care' },
-  { id: '2', label: 'Fencing' },
-  { id: '3', label: 'Painting' },
-  { id: '4', label: 'Plumbing' },
-  { id: '5', label: 'Electrical' },
-  { id: '6', label: 'Carpentry' },
-  { id: '7', label: 'Roofing' },
-  { id: '8', label: 'Handyman' },
-  { id: '9', label: 'Pressure Washing' },
-  { id: '10', label: 'Other' },
+  ...TRADE_LABELS.map((label, index) => ({ id: String(index + 1), label })),
+  { id: String(TRADE_LABELS.length + 1), label: 'Other' },
 ];
 
 export default function CustomerSearch({ navigation }) {
@@ -40,7 +33,7 @@ export default function CustomerSearch({ navigation }) {
     fetchContractors();
   }, []);
 
-  const standardTrades = ['Lawn Care', 'Fencing', 'Painting', 'Plumbing', 'Electrical', 'Carpentry', 'Roofing', 'HVAC', 'Pressure Washing', 'Handyman', 'Concrete / Masonry', 'Tree Service', 'Pool Service', 'Cleaning Service'];
+  const standardTrades = TRADE_LABELS;
 
   const filtered = selectedTrade === 'All'
     ? contractors
