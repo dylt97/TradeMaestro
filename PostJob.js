@@ -3,6 +3,8 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, Alert } fr
 import { TextInput } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
+import { auth, db } from './firebase';
+import { collection, addDoc } from 'firebase/firestore';
 import { TRADES } from './trades';
 
 export default function PostJob({ navigation }) {
@@ -12,6 +14,9 @@ export default function PostJob({ navigation }) {
   const [address, setAddress] = useState('');
   const [zipCode, setZipCode] = useState('');
   const [photo, setPhoto] = useState(null);
+
+  const selectedTrade = TRADES.find(t => t.value === trade);
+  const tradeLabel = trade === 'other' ? otherTrade : (selectedTrade?.label || trade);
 
   const pickImage = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -29,12 +34,35 @@ export default function PostJob({ navigation }) {
     }
   };
 
+  const handlePostJob = async () => {
+    if (!trade || !description || !address || !zipCode) {
+      Alert.alert('Missing Fields', 'Please fill out all required fields.');
+      return;
+    }
+    try {
+      const user = auth.currentUser;
+      await addDoc(collection(db, 'jobs'), {
+        trade: tradeLabel,
+        description: description,
+        address: address,
+        zipCode: zipCode,
+        photoUri: photo || null,
+        postedBy: user.uid,
+        status: 'open',
+        createdAt: new Date(),
+      });
+      navigation.navigate('Find Contractors');
+    } catch (error) {
+      console.error('Error posting job:', error);
+      Alert.alert('Error', 'Failed to post job. Please try again.');
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Post a Job</Text>
       <Text style={styles.subtitle}>Tell us what you need done</Text>
 
-      {/* Trade Picker */}
       <View style={styles.pickerContainer}>
         <Picker
           selectedValue={trade}
@@ -86,7 +114,6 @@ export default function PostJob({ navigation }) {
         numberOfLines={4}
       />
 
-      {/* Photo Upload */}
       <TouchableOpacity style={styles.photoButton} onPress={pickImage}>
         <Text style={styles.photoButtonText}>
           {photo ? 'Change Photo' : '📷 Add a Photo (Optional)'}
@@ -97,10 +124,7 @@ export default function PostJob({ navigation }) {
         <Image source={{ uri: photo }} style={styles.preview} />
       )}
 
-      <TouchableOpacity 
-        style={styles.button}
-        onPress={() => navigation.navigate('CustomerSearch')}
-      >
+      <TouchableOpacity style={styles.button} onPress={handlePostJob}>
         <Text style={styles.buttonText}>Post Job</Text>
       </TouchableOpacity>
 

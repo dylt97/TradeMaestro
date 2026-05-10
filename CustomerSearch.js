@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import { db } from './firebase';
 import { collection, getDocs } from 'firebase/firestore';
-import { TRADES } from './trades';
+import { TRADES, TRADE_LABELS } from './trades';
 
 const trades = [
   { id: '0', label: 'All' },

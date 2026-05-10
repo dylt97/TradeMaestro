@@ -5,7 +5,7 @@ import { Picker } from '@react-native-picker/picker';
 import { auth, db } from './firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { TRADES } from './trades';
+import { TRADES, TRADE_LABELS } from './trades';
 
 export default function ContractorSignup({ navigation }) {
   const [name, setName] = useState('');
@@ -15,6 +15,9 @@ export default function ContractorSignup({ navigation }) {
   const [zipCode, setZipCode] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const selectedTrade = TRADES.find(t => t.value === trade);
+  const tradeLabel = trade === 'other' ? otherTrade : (selectedTrade?.label || trade);
 
   const handleSignup = async () => {
     if (!name || !trade || !email || !zipCode || !password) {
@@ -31,7 +34,7 @@ export default function ContractorSignup({ navigation }) {
 
       await setDoc(doc(db, 'contractors', user.uid), {
         name: name,
-        trade: trade === 'other' ? otherTrade : trade,
+        trade: tradeLabel,
         email: email,
         zipCode: zipCode,
         role: 'contractor',
