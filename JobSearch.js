@@ -1,75 +1,59 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
-
-const jobs = [
-  {
-    id: '1',
-    trade: 'Fencing',
-    description: 'Need a 6ft wooden privacy fence installed along the back of my property. About 100 feet.',
-    address: '123 Oak Street',
-    city: 'Jellico',
-    zipCode: '37762',
-    postedBy: 'John Smith',
-    postedAgo: '2 hours ago',
-  },
-  {
-    id: '2',
-    trade: 'Lawn Care',
-    description: 'Weekly lawn mowing and edging for a medium sized yard. Looking for ongoing service.',
-    address: '456 Maple Ave',
-    city: 'Knoxville',
-    zipCode: '37902',
-    postedBy: 'Sarah Williams',
-    postedAgo: '5 hours ago',
-  },
-  {
-    id: '3',
-    trade: 'Painting',
-    description: 'Interior painting for living room and kitchen. Walls only, no ceilings.',
-    address: '789 Pine Road',
-    city: 'LaFollette',
-    zipCode: '37766',
-    postedBy: 'Mike Davis',
-    postedAgo: '1 day ago',
-  },
-  {
-    id: '4',
-    trade: 'Pressure Washing',
-    description: 'Driveway and back patio need pressure washing. Concrete surfaces only.',
-    address: '321 Elm Street',
-    city: 'Knoxville',
-    zipCode: '37901',
-    postedBy: 'Lisa Brown',
-    postedAgo: '1 day ago',
-  },
-];
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, FlatList, Alert } from 'react-native';
+import { db, auth } from './firebase';
+import { collection, getDocs } from 'firebase/firestore';
+import { TRADE_LABELS } from './trades';
 
 const trades = [
   { id: '0', label: 'All' },
-  { id: '1', label: 'Lawn Care' },
-  { id: '2', label: 'Fencing' },
-  { id: '3', label: 'Painting' },
-  { id: '4', label: 'Plumbing' },
-  { id: '5', label: 'Electrical' },
-  { id: '6', label: 'Carpentry' },
-  { id: '7', label: 'Roofing' },
-  { id: '8', label: 'Handyman' },
-  { id: '9', label: 'Pressure Washing' },
+  ...TRADE_LABELS.map((label, index) => ({ id: String(index + 1), label })),
+  { id: String(TRADE_LABELS.length + 1), label: 'Other' },
 ];
+
+const standardTrades = TRADE_LABELS;
 
 export default function JobSearch({ navigation }) {
   const [selectedTrade, setSelectedTrade] = useState('All');
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'jobs'));
+        const list = [];
+        querySnapshot.forEach((doc) => {
+          list.push({ id: doc.id, ...doc.data() });
+        });
+        setJobs(list);
+      } catch (error) {
+        console.error('Error fetching jobs:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchJobs();
+  }, []);
 
   const filtered = selectedTrade === 'All'
     ? jobs
+    : selectedTrade === 'Other'
+    ? jobs.filter(j => !standardTrades.includes(j.trade))
     : jobs.filter(j => j.trade === selectedTrade);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Loading jobs...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
 
       <Text style={styles.header}>Available Jobs</Text>
 
-      {/* Filter Pills */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -94,22 +78,28 @@ export default function JobSearch({ navigation }) {
         ))}
       </ScrollView>
 
-      {/* Job Cards */}
       <FlatList
         data={filtered}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>No jobs found.</Text>
+        }
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.card}>
             <View style={styles.cardHeader}>
               <Text style={styles.trade}>{item.trade}</Text>
-              <Text style={styles.postedAgo}>{item.postedAgo}</Text>
+              <Text style={styles.postedAgo}>
+                {item.createdAt?.seconds
+                  ? new Date(item.createdAt.seconds * 1000).toLocaleDateString()
+                  : 'Recently'}
+              </Text>
             </View>
             <Text style={styles.description} numberOfLines={2}>
               {item.description}
             </Text>
-            <Text style={styles.location}>📍 {item.city}, {item.zipCode}</Text>
-            <Text style={styles.postedBy}>Posted by {item.postedBy}</Text>
+            <Text style={styles.location}>📍 {item.address}, {item.zipCode}</Text>
+
             <TouchableOpacity style={styles.applyButton}>
               <Text style={styles.applyButtonText}>I Can Do This Job</Text>
             </TouchableOpacity>
@@ -126,6 +116,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#1a2f4e',
     paddingTop: 50,
+  },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: '#1a2f4e',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    color: '#a0b4c8',
+    fontSize: 16,
   },
   header: {
     fontSize: 26,
@@ -188,11 +188,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   location: {
-    fontSize: 13,
-    color: '#a0b4c8',
-    marginBottom: 4,
-  },
-  postedBy: {
     fontSize: 13,
     color: '#a0b4c8',
     marginBottom: 12,
