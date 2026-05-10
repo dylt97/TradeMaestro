@@ -12,6 +12,7 @@ import JobSearch from './JobSearch';
 import CustomerSearch from './CustomerSearch';
 import PostJob from './PostJob';
 import CustomerProfile from './CustomerProfile';
+import LoginScreen from './LoginScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();

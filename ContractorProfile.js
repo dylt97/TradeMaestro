@@ -1,57 +1,95 @@
-import React, {useState, useEffect} from 'react';
-import {View, Text, Image, ScrollView, TouchableOpacity, StyleSheet} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { Divider } from 'react-native-paper';
+import { auth, db } from './firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
-export default function ContractorProfile ({navigation}) {
+export default function ContractorProfile({ navigation }) {
+  const [contractor, setContractor] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-        //Todo: replace this dummy data with Firebase fetch data
-        const contractor = {
-            name: 'William Wilde',
-            trade: 'Fencing',
-            city: 'Jellico',
-            zipcode: '37762',
-            bio: 'Professional Fencer with 20 years experience. Commercial and Residential. Free estimates within 40 miles.',
-            rating: 4.9,
-            reviews: 15,
-            image: require('./image.jpeg'),
-        };
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const docRef = doc(db, 'contractors', user.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            setContractor(docSnap.data());
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, []);
 
-return (
-  <ScrollView style={styles.container}>
-    
-    {/* Header Row */}
-    <View style={styles.header}>
-      <Image 
-        source={contractor.image}
-        style={styles.avatar}
-      />
-      <View style={styles.stats}>
-        <Text style={styles.rating}>⭐ {contractor.rating}</Text>
-        <Text style={styles.reviews}>{contractor.reviews} reviews</Text>
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Loading profile...</Text>
       </View>
-    </View>
+    );
+  }
 
-    {/* Content */}
-    <View style={styles.content}>
-      <Text style={styles.name}>{contractor.name}</Text>
-      <Text style={styles.trade}>{contractor.trade}</Text>
-      <Text style={styles.city}>📍 {contractor.city}</Text>
-      <Divider style={styles.divider}/>
-      <Text style={styles.bio}>{contractor.bio}</Text>
+  if (!contractor) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Profile not found.</Text>
+      </View>
+    );
+  }
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Request Job</Text>
-      </TouchableOpacity>
-    </View>
+  return (
+    <ScrollView style={styles.container}>
 
-  </ScrollView>
-);
+      {/* Header Row */}
+      <View style={styles.header}>
+        <Image
+          source={require('./image.jpg')}
+          style={styles.avatar}
+        />
+        <View style={styles.stats}>
+          <Text style={styles.rating}>⭐ {contractor.rating || 'New'}</Text>
+          <Text style={styles.reviews}>{contractor.reviews || 0} reviews</Text>
+        </View>
+      </View>
+
+      {/* Content */}
+      <View style={styles.content}>
+        <Text style={styles.name}>{contractor.name}</Text>
+        <Text style={styles.trade}>{contractor.trade}</Text>
+        <Text style={styles.city}>📍 {contractor.zipCode}</Text>
+        <Divider style={styles.divider} />
+        <Text style={styles.bio}>{contractor.bio || 'No bio yet.'}</Text>
+
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Edit Profile</Text>
+        </TouchableOpacity>
+      </View>
+
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1a2f4e',
+  },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: '#1a2f4e',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    color: '#a0b4c8',
+    fontSize: 16,
   },
   header: {
     flexDirection: 'row',
